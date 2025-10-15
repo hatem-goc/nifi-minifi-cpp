@@ -99,13 +99,15 @@ inline constexpr std::array<std::pair<std::string_view, Aws::S3::Model::ObjectCa
   {"AwsExecRead", Aws::S3::Model::ObjectCannedACL::aws_exec_read},
 }};
 
-inline constexpr std::array<std::pair<std::string_view, Aws::S3::Model::ChecksumAlgorithm>, 5> CHECKSUM_ALGORITHM_MAP {{
+inline constexpr std::array<std::pair<std::string_view, Aws::S3::Model::ChecksumAlgorithm>, 6> CHECKSUM_ALGORITHM_MAP {{
+  {"None", Aws::S3::Model::ChecksumAlgorithm::NOT_SET},
   {"CRC32", Aws::S3::Model::ChecksumAlgorithm::CRC32},
   {"CRC32C", Aws::S3::Model::ChecksumAlgorithm::CRC32C},
   {"SHA1", Aws::S3::Model::ChecksumAlgorithm::SHA1},
   {"SHA256", Aws::S3::Model::ChecksumAlgorithm::SHA256},
-  {"CRC64NVME", Aws::S3::Model::ChecksumAlgorithm::CRC64NVME}
+  {"CRC64NVME", Aws::S3::Model::ChecksumAlgorithm::CRC64NVME},
 }};
+
 
 struct Expiration {
   std::string expiration_time;

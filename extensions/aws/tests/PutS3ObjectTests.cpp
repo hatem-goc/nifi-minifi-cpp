@@ -439,4 +439,13 @@ TEST_CASE_METHOD(PutS3ObjectTestsFixture, "Test checksum algorithm property", "[
   CHECK(mock_s3_request_sender_ptr->put_object_request.GetChecksumAlgorithm() == Aws::S3::Model::ChecksumAlgorithm::SHA256);
 }
 
+TEST_CASE_METHOD(PutS3ObjectTestsFixture, "Test request checksum calculation property", "[awsS3checksum]") {
+  setRequiredProperties();
+  plan->setProperty(s3_processor, "Request Checksum Calculation", "WHEN_NEEDED");
+  plan->setProperty(s3_processor, "Checksum Algorithm", "None");
+  test_controller.runSession(plan);
+  CHECK(mock_s3_request_sender_ptr->put_object_request.GetChecksumAlgorithm() == Aws::S3::Model::ChecksumAlgorithm::NOT_SET);
+  CHECK(mock_s3_request_sender_ptr->getClientConfig().request_checksum == Aws::Client::RequestChecksumCalculation::WHEN_REQUIRED);
+}
+
 }  // namespace

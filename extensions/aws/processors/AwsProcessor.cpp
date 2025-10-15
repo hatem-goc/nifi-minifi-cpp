@@ -86,6 +86,11 @@ void AwsProcessor::onSchedule(core::ProcessContext& context, core::ProcessSessio
   client_config_->region = context.getProperty(Region) | minifi::utils::orThrow("Region property missing or invalid");
   logger_->log_debug("AwsProcessor: Region [{}]", client_config_->region);
 
+  if (auto request_checksum = minifi::utils::parseOptionalProperty(context, RequestChecksumCalculation)) {
+    logger_->log_debug("AwsProcessor: Request Checksum Calculation {}", *request_checksum);
+    client_config_->checksumConfig.requestChecksumCalculation = minifi::utils::at(REQUEST_CHECKSUM_MAP, request_checksum);
+  }
+
   if (auto communications_timeout = minifi::utils::parseOptionalDurationProperty(context, CommunicationsTimeout)) {
     logger_->log_debug("AwsProcessor: Communications Timeout {}", *communications_timeout);
     client_config_->connectTimeoutMs = gsl::narrow<long>(communications_timeout->count());  // NOLINT(runtime/int,google-runtime-int)

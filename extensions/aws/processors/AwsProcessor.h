@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "aws/core/auth/AWSCredentialsProvider.h"
+#include "aws/s3/S3Client.h"
 #include "AWSCredentialsProvider.h"
 #include "utils/ProxyOptions.h"
 #include "core/PropertyDefinition.h"
@@ -88,6 +89,13 @@ inline constexpr auto REGIONS = std::array{
 };
 }  // namespace region
 
+inline constexpr std::array<std::pair<std::string_view, Aws::Client::RequestChecksumCalculation>, 2> REQUEST_CHECKSUM_MAP {{
+  {"WHEN_REQUIRED", Aws::Client::RequestChecksumCalculation::WHEN_REQUIRED},
+  {"WHEN_SUPPORTED", Aws::Client::RequestChecksumCalculation::WHEN_SUPPORTED},
+}};
+
+static constexpr auto REQUEST_CHECKSUM = minifi::utils::getKeys(REQUEST_CHECKSUM_MAP);
+
 struct CommonProperties {
   Aws::Auth::AWSCredentials credentials;
   aws::ProxyOptions proxy;
@@ -122,6 +130,11 @@ class AwsProcessor : public core::ProcessorImpl {  // NOLINT(cppcoreguidelines-s
       .withValidator(core::StandardPropertyValidators::TIME_PERIOD_VALIDATOR)
       .withDefaultValue("30 sec")
       .withDescription("Sets the timeout of the communication between the AWS server and the client")
+      .build();
+  EXTENSIONAPI static constexpr auto RequestChecksumCalculation = core::PropertyDefinitionBuilder<REQUEST_CHECKSUM.size()>::createProperty("Request Checksum Calculation")
+      .withDescription("Adjust when Request Checksum should be calculated.")
+      .withAllowedValues(REQUEST_CHECKSUM)
+      .isRequired(false)
       .build();
   EXTENSIONAPI static constexpr auto EndpointOverrideURL = core::PropertyDefinitionBuilder<>::createProperty("Endpoint Override URL")
       .withDescription("Endpoint URL to use instead of the AWS default including scheme, host, "
@@ -161,6 +174,7 @@ class AwsProcessor : public core::ProcessorImpl {  // NOLINT(cppcoreguidelines-s
       AWSCredentialsProviderService,
       Region,
       CommunicationsTimeout,
+      RequestChecksumCalculation,
       EndpointOverrideURL,
       ProxyHost,
       ProxyPort,
